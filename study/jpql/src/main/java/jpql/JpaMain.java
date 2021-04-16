@@ -1,12 +1,6 @@
-package hellojpa;
+package jpql;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.*;
 import java.util.List;
 
 public class JpaMain {
@@ -20,9 +14,26 @@ public class JpaMain {
         tx.begin();
 
         try{
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
             Member member = new Member();
-            member.setUsername("member1");
+            member.setUsername("관리자");
+            member.setAge(10);
+
+            member.setTeam(team);
+
             em.persist(member);
+
+            em.flush();
+            em.clear();
+
+            String query = "select nullif(m.username, '관리자') from Member m";
+            List<String> resultList = em.createQuery(query, String.class).getResultList();
+            for (String s : resultList) {
+                System.out.println("s = " + s);
+            }
 
             tx.commit();
         } catch (Exception e){
